@@ -149,7 +149,6 @@ def update_pilot_consistency(selected_year):
         height=800,  # Cambia la altura
         width=1000,  # Cambia el ancho
         margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
-        yaxis=dict(tickangle=0)  # Asegúrate de que las etiquetas sean legibles
     )
     return fig
 
@@ -258,9 +257,9 @@ def update_best_lap_times(selected_year, selected_circuit):
         height=800,  # Cambia la altura
         width=1000,  # Cambia el ancho
         margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
-        yaxis=dict(tickangle=0)  # Asegúrate de que las etiquetas sean legibles
     )
     return fig
+
 
 
 ## 8. Circuitos en el Mapa
@@ -275,11 +274,19 @@ def update_circuit_map(selected_year):
 
     fig = px.scatter_mapbox(
         circuits_map, lat="lat", lon="lng", hover_name="circuit_name",
-        zoom=1, title=f"Mapa de Circuitos en {selected_year}",
+        zoom=3,  # Cambié el zoom para visualizar mejor los circuitos
+        title=f"Mapa de Circuitos en {selected_year}",
         labels={"circuit_name": "Circuito"}
     )
-    fig.update_layout(mapbox_style="carto-positron")
+    # Actualización de diseño del mapa para mejorar su visibilidad
+    fig.update_layout(
+        mapbox_style="carto-positron",  # Elegir un estilo de mapa que sea más claro
+        height=800,  # Cambia la altura del mapa
+        width=1000,  # Cambia el ancho del mapa
+        margin={"l": 100, "r": 100, "t": 50, "b": 100}  # Márgenes para un mejor ajuste
+    )
     return fig
+
 
 ## 9. Distribución de Puntos por Piloto (Gráfico Circular)
 @app.callback(
