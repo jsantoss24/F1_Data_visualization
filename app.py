@@ -307,6 +307,7 @@ def update_titles_bar_chart(selected_year):
         "Fangio": 5,
         "Vettel": 4,
         "Prost": 4,
+        "Verstappen": 4,
         "Senna": 3,
     }
 
