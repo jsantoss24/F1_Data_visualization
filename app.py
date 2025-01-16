@@ -144,6 +144,13 @@ def update_pilot_consistency(selected_year):
         labels={"positionOrder": "Posición Promedio", "surname": "Piloto"},
         color_discrete_sequence=px.colors.qualitative.Pastel
     )
+    # Ajustar tamaño y márgenes del gráfico
+    fig.update_layout(
+        height=800,  # Cambia la altura
+        width=1000,  # Cambia el ancho
+        margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
+        yaxis=dict(tickangle=0)  # Asegúrate de que las etiquetas sean legibles
+    )
     return fig
 
 ## 3. Impacto de la Clasificación
@@ -246,7 +253,15 @@ def update_best_lap_times(selected_year, selected_circuit):
         color="surname",
         color_discrete_sequence=px.colors.qualitative.Pastel
     )
+    # Ajustar tamaño y márgenes del gráfico
+    fig.update_layout(
+        height=800,  # Cambia la altura
+        width=1000,  # Cambia el ancho
+        margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
+        yaxis=dict(tickangle=0)  # Asegúrate de que las etiquetas sean legibles
+    )
     return fig
+
 
 ## 8. Circuitos en el Mapa
 @app.callback(
