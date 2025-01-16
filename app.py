@@ -147,7 +147,7 @@ def update_pilot_consistency(selected_year):
     # Ajustar tamaño y márgenes del gráfico
     fig.update_layout(
         height=800,  # Cambia la altura
-        width=1000,  # Cambia el ancho
+        width=2000,  # Cambia el ancho
         margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
     )
     return fig
@@ -255,7 +255,7 @@ def update_best_lap_times(selected_year, selected_circuit):
     # Ajustar tamaño y márgenes del gráfico
     fig.update_layout(
         height=800,  # Cambia la altura
-        width=1000,  # Cambia el ancho
+        width=2000,  # Cambia el ancho
         margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
     )
     return fig
@@ -282,7 +282,7 @@ def update_circuit_map(selected_year):
     fig.update_layout(
         mapbox_style="carto-positron",  # Elegir un estilo de mapa que sea más claro
         height=800,  # Cambia la altura del mapa
-        width=1000,  # Cambia el ancho del mapa
+        width=2000,  # Cambia el ancho del mapa
         margin={"l": 100, "r": 100, "t": 50, "b": 100}  # Márgenes para un mejor ajuste
     )
     return fig
