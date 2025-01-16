@@ -86,12 +86,12 @@ app.layout = html.Div([
     ]),
 
     html.Div([
-        html.H2("8. Mejores Tiempos por Vuelta"),
+        html.H2("7. Mejores Tiempos por Vuelta"),
         dcc.Graph(id="best-lap-times"),
     ]),
 
     html.Div([
-        html.H2("9. Circuitos en el Mapa"),
+        html.H2("8. Circuitos en el Mapa"),
         dcc.Graph(id="circuit-map"),
     ]),
 ])
