@@ -290,13 +290,16 @@ def update_points_pie_chart(selected_year):
     Input("year-selector", "value")
 )
 def update_titles_bar_chart(selected_year):
-    driver_titles = drivers[["surname", "titles"]].dropna()
-    driver_titles = driver_titles.sort_values(by="titles", ascending=False).head(10)
+    # Calcular los títulos (máximo de puntos por piloto cada temporada)
+    season_winners = results_cleaned.groupby(["year", "surname"])["points"].sum().reset_index()
+    season_winners = season_winners.loc[season_winners.groupby("year")["points"].idxmax()]
+    titles_by_driver = season_winners["surname"].value_counts().reset_index()
+    titles_by_driver.columns = ["surname", "titles"]
 
     fig = px.bar(
-        driver_titles,
+        titles_by_driver,
         x="titles", y="surname", orientation="h",
-        title="Títulos por Piloto (Top 10)",
+        title="Títulos por Piloto (Calculados por Temporadas Ganadas)",
         labels={"titles": "Títulos", "surname": "Piloto"},
         color="surname",
         color_discrete_sequence=px.colors.qualitative.Pastel
