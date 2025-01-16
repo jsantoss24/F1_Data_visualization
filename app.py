@@ -94,6 +94,16 @@ app.layout = html.Div([
         html.H2("8. Circuitos en el Mapa"),
         dcc.Graph(id="circuit-map"),
     ]),
+
+    html.Div([
+        html.H2("9. Distribución de Puntos por Piloto"),
+        dcc.Graph(id="points-pie-chart"),
+    ]),
+
+    html.Div([
+        html.H2("10. Títulos de Pilotos"),
+        dcc.Graph(id="titles-bar-chart"),
+    ]),
 ])
 
 # Callbacks
@@ -133,6 +143,12 @@ def update_pilot_consistency(selected_year):
         title=f"Consistencia de los Pilotos en {selected_year}",
         labels={"positionOrder": "Posición Promedio", "surname": "Piloto"},
         color_discrete_sequence=px.colors.qualitative.Pastel
+    )
+    # Ajustar tamaño y márgenes del gráfico
+    fig.update_layout(
+        height=800,  # Cambia la altura
+        width=1850,  # Cambia el ancho
+        margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
     )
     return fig
 
@@ -190,6 +206,7 @@ def update_team_performance(selected_year):
     )
     return fig
 
+## 6. Evolución de los Puntos por Carrera
 @app.callback(
     Output("race-points-evolution", "figure"),
     Input("year-selector", "value")
@@ -197,44 +214,24 @@ def update_team_performance(selected_year):
 def update_race_points_evolution(selected_year):
     filtered_data = results_cleaned[results_cleaned["year"] == selected_year]
     race_points = filtered_data.groupby(["raceId", "surname"])["points"].sum().reset_index()
-
-    # Unir con la tabla races para obtener los circuitId
     race_points = race_points.merge(races[["raceId", "circuitId", "date"]], on="raceId", how="left")
-
-    # Unir con la tabla circuits para obtener los nombres de los circuitos
     race_points = race_points.merge(circuits[["circuitId", "name"]], on="circuitId", how="left")
-
-    # Asegurarse de que no haya valores nulos en 'name' y 'points'
     race_points = race_points.dropna(subset=["name", "points"])
-
-    # Ordenar los circuitos por la fecha de la carrera (si existe) o por el raceId
     race_points = race_points.sort_values(by=["date", "raceId"])
-
-    # Crear la columna de puntos acumulados
     race_points["cumulative_points"] = race_points.groupby("surname")["points"].cumsum()
-
-    # Asegurarse de que 'cumulative_points' sea numérico
-    race_points["cumulative_points"] = pd.to_numeric(race_points["cumulative_points"], errors='coerce')
-
-    # Filtrar filas con valores válidos en 'cumulative_points'
     race_points = race_points.dropna(subset=["cumulative_points"])
 
-    # Crear el gráfico de líneas
     fig = px.line(
-        race_points, 
-        x="name", 
-        y="cumulative_points", 
-        color="surname", 
+        race_points,
+        x="name", y="cumulative_points", color="surname",
         title=f"Evolución de Puntos por Carrera en {selected_year}",
         labels={"name": "Circuito", "cumulative_points": "Puntos Acumulados", "surname": "Piloto"},
         color_discrete_sequence=px.colors.qualitative.Dark2
     )
-
-    # Personalizar el gráfico
     fig.update_layout(height=700)
     return fig
 
-## 8. Mejores Tiempos por Vuelta
+## 7. Mejores Tiempos por Vuelta
 @app.callback(
     Output("best-lap-times", "figure"),
     [Input("year-selector", "value"), Input("circuit-selector", "value")]
@@ -255,9 +252,17 @@ def update_best_lap_times(selected_year, selected_circuit):
         color="surname",
         color_discrete_sequence=px.colors.qualitative.Pastel
     )
+    # Ajustar tamaño y márgenes del gráfico
+    fig.update_layout(
+        height=800,  # Cambia la altura
+        width=1850,  # Cambia el ancho
+        margin={"l": 100, "r": 100, "t": 50, "b": 100},  # Márgenes para espacio extra
+    )
     return fig
 
-## 9. Circuitos en el Mapa
+
+
+## 8. Circuitos en el Mapa
 @app.callback(
     Output("circuit-map", "figure"),
     Input("year-selector", "value")
@@ -269,11 +274,87 @@ def update_circuit_map(selected_year):
 
     fig = px.scatter_mapbox(
         circuits_map, lat="lat", lon="lng", hover_name="circuit_name",
-        zoom=1, title=f"Mapa de Circuitos en {selected_year}",
+        zoom=3,  # Cambié el zoom para visualizar mejor los circuitos
+        title=f"Mapa de Circuitos en {selected_year}",
         labels={"circuit_name": "Circuito"}
     )
-    fig.update_layout(mapbox_style="carto-positron")
+    # Actualización de diseño del mapa para mejorar su visibilidad
+    fig.update_layout(
+        mapbox_style="carto-positron",  # Elegir un estilo de mapa que sea más claro
+        height=800,  # Cambia la altura del mapa
+        width=1850,  # Cambia el ancho del mapa
+        margin={"l": 100, "r": 100, "t": 50, "b": 100}  # Márgenes para un mejor ajuste
+    )
     return fig
+
+
+## 9. Distribución de Puntos por Piloto (Gráfico Circular)
+@app.callback(
+    Output("points-pie-chart", "figure"),
+    Input("year-selector", "value")
+)
+def update_points_pie_chart(selected_year):
+    filtered_data = results_cleaned[results_cleaned["year"] == selected_year]
+    points_by_driver = filtered_data.groupby("surname")["points"].sum().reset_index()
+
+    fig = px.pie(
+        points_by_driver,
+        names="surname", values="points",
+        title=f"Distribución de Puntos en {selected_year}",
+        labels={"surname": "Piloto", "points": "Puntos"},
+        color_discrete_sequence=px.colors.qualitative.Set3
+    )
+    return fig
+
+## 10. Títulos de Pilotos (Gráfico de Barras)
+@app.callback(
+    Output("titles-bar-chart", "figure"),
+    Input("year-selector", "value")
+)
+def update_titles_bar_chart(selected_year):
+    # Calcular los títulos correctamente (máximo de puntos por piloto cada temporada)
+    season_winners = results_cleaned.groupby(["year", "surname"])["points"].sum().reset_index()
+
+    # Asegurarse de contar solo al ganador por temporada
+    season_winners = season_winners.loc[season_winners.groupby("year")["points"].idxmax()]
+
+    # Contar los títulos por piloto
+    titles_by_driver = season_winners["surname"].value_counts().reset_index()
+    titles_by_driver.columns = ["surname", "titles"]
+
+    # Filtrar títulos conocidos (limitar manualmente si necesario)
+    known_titles = {
+        "Schumacher": 7,
+        "Hamilton": 7,
+        "Fangio": 5,
+        "Vettel": 4,
+        "Prost": 4,
+        "Verstappen": 4,
+        "Senna": 3,
+    }
+
+    # Normalizar nombres de pilotos en los datos
+    titles_by_driver["surname"] = titles_by_driver["surname"].str.strip()
+
+    # Añadir títulos oficiales al gráfico
+    titles_by_driver["official_titles"] = titles_by_driver["surname"].map(known_titles).fillna(0)
+
+    # Filtrar los pilotos con al menos 1 título
+    titles_by_driver = titles_by_driver[titles_by_driver["official_titles"] > 0]
+
+    # Crear gráfico
+    fig = px.bar(
+        titles_by_driver.sort_values(by="official_titles", ascending=False),
+        x="official_titles", y="surname", orientation="h",
+        title="Títulos por Piloto (Oficiales)",
+        labels={"official_titles": "Títulos", "surname": "Piloto"},
+        color="surname",
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
+    fig.update_layout(showlegend=False)  # Quitar leyenda si no es necesaria
+    return fig
+
+
 
 # Ejecutar la aplicación
 if __name__ == "__main__":
