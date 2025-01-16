@@ -302,25 +302,35 @@ def update_titles_bar_chart(selected_year):
 
     # Filtrar títulos conocidos (limitar manualmente si necesario)
     known_titles = {
-        "Michael Schumacher": 7,
-        "Lewis Hamilton": 7,
-        "Juan Manuel Fangio": 5,
-        "Sebastian Vettel": 4,
-        "Alain Prost": 4,
-        "Ayrton Senna": 3,
-        # Añadir más pilotos y títulos oficiales si es necesario
+        "Schumacher": 7,
+        "Hamilton": 7,
+        "Fangio": 5,
+        "Vettel": 4,
+        "Prost": 4,
+        "Senna": 3,
     }
-    titles_by_driver["titles"] = titles_by_driver["surname"].map(known_titles).fillna(0)
 
+    # Normalizar nombres de pilotos en los datos
+    titles_by_driver["surname"] = titles_by_driver["surname"].str.strip()
+
+    # Añadir títulos oficiales al gráfico
+    titles_by_driver["official_titles"] = titles_by_driver["surname"].map(known_titles).fillna(0)
+
+    # Filtrar los pilotos con al menos 1 título
+    titles_by_driver = titles_by_driver[titles_by_driver["official_titles"] > 0]
+
+    # Crear gráfico
     fig = px.bar(
-        titles_by_driver.sort_values(by="titles", ascending=False),
-        x="titles", y="surname", orientation="h",
+        titles_by_driver.sort_values(by="official_titles", ascending=False),
+        x="official_titles", y="surname", orientation="h",
         title="Títulos por Piloto (Oficiales)",
-        labels={"titles": "Títulos", "surname": "Piloto"},
+        labels={"official_titles": "Títulos", "surname": "Piloto"},
         color="surname",
         color_discrete_sequence=px.colors.qualitative.Pastel
     )
+    fig.update_layout(showlegend=False)  # Quitar leyenda si no es necesaria
     return fig
+
 
 
 # Ejecutar la aplicación
